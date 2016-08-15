@@ -3,7 +3,7 @@
 Summary:  A tcl/tk password manager
 Name:     password-%{sname}
 Version:  1.5.3.7
-Release:  0
+Release:  1
 License:  GPLv2+
 Group:    File tools
 URL:      http://zdia.de/downloads/%{sname}/index.html
