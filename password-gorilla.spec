@@ -7,7 +7,7 @@ Release:	1
 License:	GPLv2+
 Group:		File tools
 URL:		http://zdia.de/downloads/%{sname}/index.html
-Source0:	https://github.com/zdia/%{sname}/archive/v%{version}.tar.gz
+Source0:	%{sname}-%{version}.tar.gz
 Patch0:		%{name}-1.5.3.7-tclsh_version-patch
 BuildArch:	noarch
 
