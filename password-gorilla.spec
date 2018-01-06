@@ -12,7 +12,7 @@ Group:		File tools
 URL:		http://zdia.de/downloads/%{sname}/index.html
 #Source0:	https://github.com/zdia/%{sname}/archive/v%{version}/%{name}-%{version}.tar.gz
 Source0:	https://github.com/zdia/%{sname}/archive/%{commit}/%{name}-%{commit}.tar.gz
-Patch0:		%{name}-1.5.3.7-tclsh_version-patch
+#Patch0:		%{name}-1.5.3.7-tclsh_version-patch
 BuildArch:	noarch
 
 #Depends: tcl8.5, tk8.5, itcl3, tcllib, tklib, ${misc:Depends}
