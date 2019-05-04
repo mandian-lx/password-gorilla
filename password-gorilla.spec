@@ -1,23 +1,27 @@
-%define commit e4dfc87aa1d3e974c065511e34f3a14b61641c34
+%define commit 18206d30a62f1a9843ba541d73e6c9460ec5fb56
 %define shortcommit %(c=%{commit}; echo ${c:0:7})
 
 %define sname gorilla
 
+# Latest version is quite old so actually pre-release
+# version actually it may be safey
+%define pre_release 0
+
 Summary:	A tcl/tk password manager
 Name:		password-%{sname}
-Version:	1.5.3.7
+Version:	1.5.3.8
 Release:	0
 License:	GPLv2+
 Group:		File tools
-URL:		http://zdia.de/downloads/%{sname}/index.html
-#Source0:	https://github.com/zdia/%{sname}/archive/v%{version}/%{name}-%{version}.tar.gz
+URL:		https://github.com/zdia
+%if %{pre_release}
 Source0:	https://github.com/zdia/%{sname}/archive/%{commit}/%{name}-%{commit}.tar.gz
-#Patch0:		%{name}-1.5.3.7-tclsh_version-patch
-# https://github.com/zdia/gorilla/commit/6284d86ebafc8a65ad7e1fc1626282317d608788
-Patch1:		%{name}-1.5.3.7-unbundle_tcllib_uuid_module.patch
+%else
+Source0:	https://github.com/zdia/%{sname}/archive/v%{version}/%{name}-%{version}.tar.gz
+Patch0:		%{name}-1.5.3.7-unbundle_tcllib_uuid_module.patch
+%endif
 BuildArch:	noarch
 
-#Depends: tcl8.5, tk8.5, itcl3, tcllib, tklib, ${misc:Depends}
 BuildRequires:	docbook-to-man
 BuildRequires:	imagemagick
 BuildRequires:	librsvg
@@ -46,21 +50,17 @@ A tcl/tk password manager.
 #---------------------------------------------------------------------------
 
 %prep
-#% setup -q -n %{sname}-%{version}
+%if %{pre_release}
 %setup -q -n %{sname}-%{commit}
-%apply_patches
+%else
+%setup -q -n %{sname}-%{version}
+%endif
+%autopatch -p1
 
-# remove uuid tcllibmodule (see patch1)
-rm -fr sources/tcllib/uuid
-
-# fix file-not-utf8 warning
-for f in sources/CHANGES.txt
-do
-	iconv -f ISO-8859-1 -t UTF-8 $f >${f}.tmp
-	chmod --reference=$f ${f}.tmp
-	touch --reference=$f ${f}.tmp
-	mv ${f}.tmp $f
-done
+# fix version
+%if %{pre_release}
+	sed -i -e "s|{\$Revision: 1.5.3.7 \$}|\{\$Revision: %{version} pre-release \$}|" sources/gorilla.tcl
+%endif
 
 # launcher
 cat > %{name}.sh << EOF
@@ -102,6 +102,7 @@ install -pm 0644 sources/msgs/*msg %{buildroot}%{_datadir}/%{name}/msgs/
 
 install -dm 0755 %{buildroot}%{_datadir}/%{name}/msgs/help/
 install -pm 0644 sources/msgs/help/*msg %{buildroot}%{_datadir}/%{name}/msgs/help/
+install -pm 0644 sources/help.txt %{buildroot}%{_datadir}/%{name}/
 
 install -dm 0755 %{buildroot}%{_datadir}/%{name}/pics/
 install -pm 0644 sources/pics/application.gif %{buildroot}%{_datadir}/%{name}/pics/
@@ -114,13 +115,12 @@ install -pm 0644 sources/pics/splash.gif %{buildroot}%{_datadir}/%{name}/pics/
 # manpage
 #FIXME: add manpage
 
-
 # .desktop file
 install -dm 0755 %{buildroot}%{_datadir}/applications/
 cat > %{buildroot}%{_datadir}/applications/openmandriva-%{name}.desktop << EOF
 [Desktop Entry]
 Name=%{name}
-Comment="lightwaight password manager"
+Comment="lightweight password manager"
 Exec=%{name}
 Icon=%{name}
 Terminal=false
@@ -149,4 +149,3 @@ done
 %check
 # .desktop
 desktop-file-validate %{buildroot}%{_datadir}/applications/openmandriva-%{name}.desktop
-
